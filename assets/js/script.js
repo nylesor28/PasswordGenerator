@@ -146,7 +146,6 @@ function generatePassword(){
 
     var randSelIndex = Math.floor(Math.random()*randomSelArray.length);
     var randCharType = randomSelArray[randSelIndex];
-    console.log(randCharType);
 
       if (randCharType === "upper"){
           randomPW += lettersUpper.charAt(Math.floor(Math.random()*lettersUpper.length));
@@ -160,7 +159,6 @@ function generatePassword(){
         alertUser ("something went wrong")
       }
 }
-  console.log("PW Length: " + randomPW.length);
   return randomPW;
 }
 
