@@ -5,14 +5,11 @@ const passwordMin = 8;
 const passwordMax = 128;
 
 var lettersUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-var lettersLower = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toLowerCase();
+var lettersLower = lettersUpper.toLowerCase();
 var specialCharacters = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
 var numbers ="0123456789"
 
 var pwCriteria = {};
-var randomSelArray = [];
-
-
 var endProcessMsg = "The Password Generation Process has been canceled!"
 
 
@@ -20,11 +17,11 @@ var endProcessMsg = "The Password Generation Process has been canceled!"
  * Resent properties in pwCriteria object to default values
  *************************************************************/
 var resetPWCriteria = function(){
-  var pwCriteria =
+  pwCriteria =
   {
     "pwLength" : 0,
     "inclUpper" : false,
-    "incLower" : false,
+    "inclLower" : false,
     "inclNumbers" : false,
     "inclSpecial" : false
   }
@@ -58,7 +55,7 @@ var confirmWithUser = function (message){
  **********************************************************************************************/
 var establishPasswordCriteria = function() {
 
-  var incLower = false;
+  var inclLower = false;
   var inclUpper = false;
   var inclNumbers = false;
   var specialCharacters = false;
@@ -67,7 +64,7 @@ var establishPasswordCriteria = function() {
 
   while(!proceed){
       var pwLengthRsp = prompt("Enter you desired password length ("+ passwordMin + " - " + passwordMax +").");
-      //If User Clicks Cancel, notifiy user and end process
+      //If User Clicks Cancel, notify user and end process
       if (pwLengthRsp === null) {
         alertUser(endProcessMsg);
         resetPWCriteria();
@@ -106,25 +103,75 @@ var establishPasswordCriteria = function() {
       }
       else {
         if(inclLower){
-          pwCriteria.incLower = incLower;
-          randomSelArray.push("lower");
+          pwCriteria.inclLower = inclLower;
         }
         if(inclUpper){
           pwCriteria.inclUpper = inclUpper;
-          randomSelArray.push("upper");
         }
         if(inclNumbers){
           pwCriteria.inclNumbers = inclNumbers;
-          randomSelArray.push("numeric");
         }
         if(inclSpecialCharacters){
           pwCriteria.inclSpecialCharacters = inclSpecialCharacters;
-          randomSelArray.push("special");
         }
         proceed = true;
       }
     }
 } 
+
+/***********************************************************************
+ * Validates password to ensure it meets the desired criteria
+ ************************************************************************/
+
+var isRandomPasswordValid = function (checkPw) {
+  var isValid = true;
+  var numSpecial = 0;
+  var numUpper = 0;
+  var numLower = 0;
+  var numNumeric = 0;
+
+  //Iterate through the password Parameter and increment the count for each type of character found
+  for(var i = 0; i<checkPw.length; i++) {
+      var indexedCharacter = checkPw[i];
+      
+      if (lettersUpper.includes(indexedCharacter)){
+        numUpper++;
+      }
+      else if(lettersLower.includes(indexedCharacter)){
+        numLower++;
+      }
+      else if(specialCharacters.includes(indexedCharacter)){
+        numSpecial++;
+      }
+      else if(numbers.includes(indexedCharacter)){
+        numNumeric++;
+      }
+  }
+
+  //check each criteria to ensure the number of characters for that criteria isn't zero. if So update isValid to False
+  if (pwCriteria.inclUpper){
+    if(!numUpper){
+      isValid = false;
+    }
+  }
+  if (pwCriteria.inclLower){
+    if(!numLower){
+      isValid = false;
+    }
+  }
+  if (pwCriteria.inclSpecialCharacters){
+    if(!numSpecial){
+      isValid = false;
+    }
+  }
+  if (pwCriteria.inclNumbers){
+    if(!numNumeric){
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
 
 
 /************************************************************************
@@ -132,40 +179,64 @@ var establishPasswordCriteria = function() {
  ***********************************************************************/
      
 function generatePassword(){
-  randomSelArray = [];
-  var completedSelArray = [];
+  var randomSelArray = [];
   var randomPW ="";
+  var done = false;
+  var loopCount = 0;
   
   
   resetPWCriteria();
   establishPasswordCriteria();
 
-  for(var i=0; i < pwCriteria.pwLength; i++){
-    
-    var randChar = '';
+  //populate randomeSelArray which will be used to randomly determine the next character type to choose from
+  if(pwCriteria.inclLower){
+    randomSelArray.push("lower");
+  }
+  if(pwCriteria.inclUpper){
+    randomSelArray.push("upper");
+  }
+  if(pwCriteria.inclNumbers){
+    randomSelArray.push("numeric");
+  }
+  if(inclSpecialCharacters){
+    randomSelArray.push("special");
+  }
 
-    var randSelIndex = Math.floor(Math.random()*randomSelArray.length);
-    var randCharType = randomSelArray[randSelIndex];
+  //loops through until the generated password matches the users criteria
+  while(!done){
+    randomPW ="";
 
-      if (randCharType === "upper"){
-          randomPW += lettersUpper.charAt(Math.floor(Math.random()*lettersUpper.length));
-      } else if (randCharType === "lower"){
-        randomPW += lettersLower.charAt(Math.floor(Math.random()*lettersLower.length));
-      } else if (randCharType === "special"){
-        randomPW += specialCharacters.charAt(Math.floor(Math.random()*specialCharacters.length));
-      } else if (randCharType === "numeric"){
-        randomPW += numbers.charAt(Math.floor(Math.random()*numbers.length));
-      } else {
-        alertUser ("something went wrong")
+    //loop through and randomly select characters based on users input
+    for(var i=0; i < pwCriteria.pwLength; i++){
+      var randChar = '';
+
+      //randomly select the next type of character to draw from, then randomly select that next character from appropriate list
+      
+      var randSelIndex = Math.floor(Math.random()*randomSelArray.length);
+      var randCharType = randomSelArray[randSelIndex];
+
+        if (randCharType === "upper"){
+            randomPW += lettersUpper.charAt(Math.floor(Math.random()*lettersUpper.length));
+        } else if (randCharType === "lower"){
+          randomPW += lettersLower.charAt(Math.floor(Math.random()*lettersLower.length));
+        } else if (randCharType === "special"){
+          randomPW += specialCharacters.charAt(Math.floor(Math.random()*specialCharacters.length));
+        } else if (randCharType === "numeric"){
+          randomPW += numbers.charAt(Math.floor(Math.random()*numbers.length));
+        } else {
+          alertUser ("something went wrong")
+        }
       }
-}
+      //verify the generated password meets the criteria before exiting loop
+      done = isRandomPasswordValid(randomPW);
+    }
   return randomPW;
 }
 
 
 // Write password to the #password input
 function writePassword() {
-  
+
   var password = generatePassword();
 
   var passwordText = document.querySelector("#password");
