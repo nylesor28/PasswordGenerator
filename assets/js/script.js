@@ -24,7 +24,7 @@ var resetPWCriteria = function(){
   {
     "pwLength" : 0,
     "inclUpper" : false,
-    "incLower" : false,
+    "inclLower" : false,
     "inclNumbers" : false,
     "inclSpecial" : false
   }
@@ -58,7 +58,7 @@ var confirmWithUser = function (message){
  **********************************************************************************************/
 var establishPasswordCriteria = function() {
 
-  var incLower = false;
+  var inclLower = false;
   var inclUpper = false;
   var inclNumbers = false;
   var specialCharacters = false;
@@ -106,20 +106,16 @@ var establishPasswordCriteria = function() {
       }
       else {
         if(inclLower){
-          pwCriteria.incLower = incLower;
-          randomSelArray.push("lower");
+          pwCriteria.inclLower = inclLower;
         }
         if(inclUpper){
           pwCriteria.inclUpper = inclUpper;
-          randomSelArray.push("upper");
         }
         if(inclNumbers){
           pwCriteria.inclNumbers = inclNumbers;
-          randomSelArray.push("numeric");
         }
         if(inclSpecialCharacters){
           pwCriteria.inclSpecialCharacters = inclSpecialCharacters;
-          randomSelArray.push("special");
         }
         proceed = true;
       }
@@ -140,6 +136,23 @@ function generatePassword(){
   resetPWCriteria();
   establishPasswordCriteria();
 
+
+  //populate randomeSelArray which will be used to randomly determine the next character type to choose from
+  if(pwCriteria.inclLower){
+    randomSelArray.push("lower");
+  }
+  if(pwCriteria.inclUpper){
+    randomSelArray.push("upper");
+  }
+  if(pwCriteria.inclNumbers){
+    randomSelArray.push("numeric");
+  }
+  if(inclSpecialCharacters){
+    randomSelArray.push("special");
+  }
+
+
+  //loop through and randomly select characters based on users input
   for(var i=0; i < pwCriteria.pwLength; i++){
     
     var randChar = '';
