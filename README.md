@@ -32,3 +32,6 @@ THEN the password is either displayed in an alert or written to the page
 
 ## Starter Code
  UCONN BootCamp Starter Code: <https://github.com/coding-boot-camp/friendly-parakeet>
+
+ ## Final Product
+![Screen Print for Reference of Password Generator](/assets/images/password-generator.png)
